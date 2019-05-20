@@ -1,29 +1,18 @@
 import React from 'react'
 import { Link } from 'react-router-dom'
 
-class SignUpForm extends React.Component {
+class SignInForm extends React.Component {
   constructor (props) {
     super(props)
     this.state = {
-      firstname: '',
-      lastname: '',
       username: '',
       password: ''
     }
-
-    this.handleChangeFirstName = this.handleChangeFirstName.bind(this)
-    this.handleChangeLastName = this.handleChangeLastName.bind(this)
     this.handleChangeUsername = this.handleChangeUsername.bind(this)
     this.handleChangePassword = this.handleChangePassword.bind(this)
     this.handleSubmit = this.handleSubmit.bind(this)
   }
 
-  handleChangeFirstName (event) {
-    this.setState({ firstname: event.target.value })
-  }
-  handleChangeLastName (event) {
-    this.setState({ lastname: event.target.value })
-  }
   handleChangeUsername (event) {
     this.setState({ username: event.target.value })
   }
@@ -41,18 +30,6 @@ class SignUpForm extends React.Component {
       <div>
         <form onSubmit={this.handleSubmit} className='FormFields'>
           <div className='FormField'>
-            <label className='FormField__Label' >First Name: </label>
-            <input type='text' name='fistname' className='FormField__Input'
-              placeholder='Enter your first name'
-              value={this.state.firstname} onChange={this.handleChangeFirstName} />
-          </div>
-          <div className='FormField'>
-            <label className='FormField__Label' >Last Name: </label>
-            <input type='text' name='lastname' className='FormField__Input'
-              placeholder='Enter your last name'
-              value={this.state.lastname} onChange={this.handleChangeLastName} />
-          </div>
-          <div className='FormField'>
             <label className='FormField__Label' >Username: </label>
             <input type='text' name='username' className='FormField__Input'
               placeholder='Enter your username'
@@ -64,15 +41,14 @@ class SignUpForm extends React.Component {
               placeholder='Enter your password'
               value={this.state.password} onChange={this.handleChangePassword} />
           </div>
-          <button type='submit'>Sign up</button>
+          <button type='submit'>Sign In</button>
         </form>
         <div>
           <Link to='/'> Home Page </Link>
         </div>
-        <Link to='/auth/signin'> I have an account - Sign In </Link>
-      </div>
+        <Link to='/auth/signup'> I don't have an account - Sign Up </Link>      </div>
     )
   }
 }
 
-export default SignUpForm
+export default SignInForm
