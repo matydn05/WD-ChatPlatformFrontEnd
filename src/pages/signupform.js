@@ -1,7 +1,31 @@
 import React from 'react'
 import { Link } from 'react-router-dom'
 import gql from 'graphql-tag'
-import { graphql } from 'react-apollo'
+import { Mutation } from 'react-apollo'
+
+const signUpMutation = gql`
+mutation signupmutation(
+  $firstname: String!
+  $lastname: String!
+  $username: String!
+  $password: String!
+) {
+  signup(
+    data: {
+      firstName: $firstname
+      lastName: $lastname
+      username: $username
+      password: $password
+    }
+  ){
+    authError
+    user {
+      username
+      lastName
+    }
+    jwt
+  }
+}`
 
 class SignUpForm extends React.Component {
   constructor (props) {
@@ -18,13 +42,6 @@ class SignUpForm extends React.Component {
     this.handleChangeUsername = this.handleChangeUsername.bind(this)
     this.handleChangePassword = this.handleChangePassword.bind(this)
     this.handleSubmit = this.handleSubmit.bind(this)
-  }
-
-  onSubmit = async () => {
-    const response = await this.props.mutate({
-      variables: this.state
-    })
-    console.log(response)
   }
 
   handleChangeFirstName (event) {
@@ -57,7 +74,7 @@ class SignUpForm extends React.Component {
           </div>
           <div className='FormField'>
             <label className='FormField__Label' >Last Name: </label>
-            <input type='text' name='lastnamegit' className='FormField__Input'
+            <input type='text' name='lastname' className='FormField__Input'
               placeholder='Enter your last name'
               value={this.state.lastname} onChange={this.handleChangeLastName} />
           </div>
@@ -73,7 +90,9 @@ class SignUpForm extends React.Component {
               placeholder='Enter your password'
               value={this.state.password} onChange={this.handleChangePassword} />
           </div>
-          <button onClick={this.onSubmit} type='submit'>Sign up</button>
+          <Mutation mutation={signUpMutation} variables={this.state}  >
+            {signupmutation => <button onClick={signupmutation} type='submit'>Sign up</button>}
+          </Mutation>
         </form>
         <div>
           <Link to='/'> Home Page </Link>
@@ -84,28 +103,4 @@ class SignUpForm extends React.Component {
   }
 }
 
-const registerMutation = gql`
-mutation(
-  $firstname: String!
-  $lastname: String!
-  $username: String!
-  $password: String!
-) {
-  signup(
-    data: {
-      firstName: $firstname
-      lastName: $lastname
-      username: $username
-      password: $password
-    }
-  ){
-    authError
-    user {
-      username
-      lastName
-    }
-    jwt
-  }
-}`
-
-export default graphql(registerMutation)(SignUpForm)
+export default SignUpForm
