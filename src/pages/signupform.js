@@ -57,7 +57,7 @@ class SignUpForm extends React.Component {
           </div>
           <div className='FormField'>
             <label className='FormField__Label' >Last Name: </label>
-            <input type='text' name='lastname' className='FormField__Input'
+            <input type='text' name='lastnamegit' className='FormField__Input'
               placeholder='Enter your last name'
               value={this.state.lastname} onChange={this.handleChangeLastName} />
           </div>
