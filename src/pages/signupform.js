@@ -1,5 +1,7 @@
 import React from 'react'
 import { Link } from 'react-router-dom'
+import gql from 'graphql-tag'
+import { graphql } from 'react-apollo'
 
 class SignUpForm extends React.Component {
   constructor (props) {
@@ -16,6 +18,13 @@ class SignUpForm extends React.Component {
     this.handleChangeUsername = this.handleChangeUsername.bind(this)
     this.handleChangePassword = this.handleChangePassword.bind(this)
     this.handleSubmit = this.handleSubmit.bind(this)
+  }
+
+  onSubmit = async () => {
+    const response = await this.props.mutate({
+      variables: this.state
+    })
+    console.log(response)
   }
 
   handleChangeFirstName (event) {
@@ -64,7 +73,7 @@ class SignUpForm extends React.Component {
               placeholder='Enter your password'
               value={this.state.password} onChange={this.handleChangePassword} />
           </div>
-          <button type='submit'>Sign up</button>
+          <button onClick={this.onSubmit} type='submit'>Sign up</button>
         </form>
         <div>
           <Link to='/'> Home Page </Link>
@@ -75,4 +84,28 @@ class SignUpForm extends React.Component {
   }
 }
 
-export default SignUpForm
+const registerMutation = gql`
+mutation(
+  $firstname: String!
+  $lastname: String!
+  $username: String!
+  $password: String!
+) {
+  signup(
+    data: {
+      firstName: $firstname
+      lastName: $lastname
+      username: $username
+      password: $password
+    }
+  ){
+    authError
+    user {
+      username
+      lastName
+    }
+    jwt
+  }
+}`
+
+export default graphql(registerMutation)(SignUpForm)
