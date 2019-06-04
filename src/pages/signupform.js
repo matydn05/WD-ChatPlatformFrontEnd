@@ -1,5 +1,5 @@
 import React from 'react'
-import { Link, Redirect } from 'react-router-dom'
+import { Link } from 'react-router-dom'
 import gql from 'graphql-tag'
 import { Mutation } from 'react-apollo'
 
@@ -104,14 +104,18 @@ class SignUpForm extends React.Component {
               }
             }}
           >
-            {(signupmutation, { loading, error, data }) => console.log(data) || (
+            {(signupmutation, { loading, error, data }) => (
               <div>
                 <button onClick={signupmutation} type='submit'>Sign up</button>
-                {data && data.authError && <p> Error</p>}
+                {data && data.signup.authError && <p> Error </p>}
                 {loading && <p>Loading...</p>}
                 {error && <p>Error :( Please try again</p>}
+                {data && data.signup.jwt && <p>Your account has been successfully created, 
+                  <Link to='/auth/signin'>Sign In!</Link>
+                </p>}
               </div>
-            )}
+            )
+            }
           </Mutation>
         </form>
         <div>
