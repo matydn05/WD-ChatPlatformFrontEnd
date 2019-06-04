@@ -1,5 +1,5 @@
 import React from 'react'
-import { Link } from 'react-router-dom'
+import { Link, Redirect } from 'react-router-dom'
 import gql from 'graphql-tag'
 import { Mutation } from 'react-apollo'
 
@@ -19,13 +19,15 @@ mutation signupmutation(
     }
   ){
     authError
-    user {
-      username
-      lastName
-    }
     jwt
   }
 }`
+
+const GET_TOKEN = gql`
+query getToken {
+  token @client
+}
+`
 
 class SignUpForm extends React.Component {
   constructor (props) {
@@ -90,8 +92,26 @@ class SignUpForm extends React.Component {
               placeholder='Enter your password'
               value={this.state.password} onChange={this.handleChangePassword} />
           </div>
-          <Mutation mutation={signUpMutation} variables={this.state}  >
-            {signupmutation => <button onClick={signupmutation} type='submit'>Sign up</button>}
+          <Mutation
+            mutation={signUpMutation}
+            variables={this.state}
+            update={(cache, { data: { signup } }) => {
+              if (signup.jwt) {
+                cache.writeQuery({
+                  query: GET_TOKEN,
+                  data: { token: signup.jwt }
+                })
+              }
+            }}
+          >
+            {(signupmutation, { loading, error, data }) => console.log(data) || (
+              <div>
+                <button onClick={signupmutation} type='submit'>Sign up</button>
+                {data && data.authError && <p> Error</p>}
+                {loading && <p>Loading...</p>}
+                {error && <p>Error :( Please try again</p>}
+              </div>
+            )}
           </Mutation>
         </form>
         <div>
