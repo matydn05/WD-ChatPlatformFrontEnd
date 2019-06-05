@@ -110,8 +110,9 @@ class SignUpForm extends React.Component {
                 {data && data.signup.authError && <p> Error </p>}
                 {loading && <p>Loading...</p>}
                 {error && <p>Error :( Please try again</p>}
-                {data && data.signup.jwt && <p>Your account has been successfully created, 
-                  <Link to='/auth/signin'>Sign In!</Link>
+                {data && data.signup.jwt &&
+                <p>
+                  Your account has been successfully created, <Link to='/auth/signin'>Sign In!</Link>
                 </p>}
               </div>
             )
