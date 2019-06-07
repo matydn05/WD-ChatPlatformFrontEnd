@@ -1,5 +1,29 @@
 import React from 'react'
-import { Link } from 'react-router-dom'
+import { Link, Redirect } from 'react-router-dom'
+import gql from 'graphql-tag'
+import { Mutation } from 'react-apollo'
+
+const signInMutation = gql`
+mutation signinmutation(
+  $username: String!
+  $password: String!
+) {
+  signin(
+    data: {
+      username: $username
+      password: $password
+    }
+  ){
+    authError
+    jwt
+  }
+}`
+
+const GET_TOKEN = gql`
+query getToken {
+  token @client
+}
+`
 
 class SignInForm extends React.Component {
   constructor (props) {
@@ -41,7 +65,32 @@ class SignInForm extends React.Component {
               placeholder='Enter your password'
               value={this.state.password} onChange={this.handleChangePassword} />
           </div>
-          <button type='submit'>Sign In</button>
+          <Mutation
+            mutation={signInMutation}
+            variables={this.state}
+            update={(cache, { data: { signin } }) => {
+              if (signin.jwt) {
+                cache.writeQuery({
+                  query: GET_TOKEN,
+                  data: { token: signin.jwt }
+                })
+              }
+            }}
+          >
+            {(signinmutation, { loading, error, data }) => {
+              if (data && data.signin.jwt) {
+                return <Redirect to='/currentuser' />
+              }
+              return (
+                <div>
+                  <button onClick={signinmutation} type='submit'>Sign in</button>
+                  {data && data.signin.authError && <p> Error</p>}
+                  {loading && <p>Loading...</p>}
+                  {error && <p>Error :( Please try again</p>}
+                </div>
+              )
+            }}
+          </Mutation>
         </form>
         <div>
           <Link to='/'> Home Page </Link>

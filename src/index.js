@@ -2,11 +2,29 @@ import React from 'react'
 import './index.css'
 import App from './App'
 import * as serviceWorker from './serviceWorker'
-import ApolloClient from 'apollo-boost'
+import ApolloClient, { InMemoryCache, gql } from 'apollo-boost'
 import { render } from 'react-dom'
 import { ApolloProvider } from 'react-apollo'
 
-const client = new ApolloClient({ uri: 'http://localhost:3001/graphql' })
+const GET_TOKEN = gql`
+query getToken {
+  token @client
+}
+`
+
+const cache = new InMemoryCache()
+
+cache.writeData({ data: { token: null } })
+
+const client = new ApolloClient(
+  {
+    uri: 'http://localhost:3001/graphql',
+    cache,
+    request: (operation) => {
+      const { token } = cache.readQuery({ query: GET_TOKEN })
+      operation.setContext({ headers: { Authorization: 'Bearer ' + token } })
+    }
+  })
 
 render(
   <ApolloProvider client={client}>

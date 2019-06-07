@@ -1,5 +1,33 @@
 import React from 'react'
 import { Link } from 'react-router-dom'
+import gql from 'graphql-tag'
+import { Mutation } from 'react-apollo'
+
+const signUpMutation = gql`
+mutation signupmutation(
+  $firstname: String!
+  $lastname: String!
+  $username: String!
+  $password: String!
+) {
+  signup(
+    data: {
+      firstName: $firstname
+      lastName: $lastname
+      username: $username
+      password: $password
+    }
+  ){
+    authError
+    jwt
+  }
+}`
+
+const GET_TOKEN = gql`
+query getToken {
+  token @client
+}
+`
 
 class SignUpForm extends React.Component {
   constructor (props) {
@@ -64,7 +92,32 @@ class SignUpForm extends React.Component {
               placeholder='Enter your password'
               value={this.state.password} onChange={this.handleChangePassword} />
           </div>
-          <button type='submit'>Sign up</button>
+          <Mutation
+            mutation={signUpMutation}
+            variables={this.state}
+            update={(cache, { data: { signup } }) => {
+              if (signup.jwt) {
+                cache.writeQuery({
+                  query: GET_TOKEN,
+                  data: { token: signup.jwt }
+                })
+              }
+            }}
+          >
+            {(signupmutation, { loading, error, data }) => (
+              <div>
+                <button onClick={signupmutation} type='submit'>Sign up</button>
+                {data && data.signup.authError && <p> Error </p>}
+                {loading && <p>Loading...</p>}
+                {error && <p>Error :( Please try again</p>}
+                {data && data.signup.jwt &&
+                <p>
+                  Your account has been successfully created, <Link to='/auth/signin'>Sign In!</Link>
+                </p>}
+              </div>
+            )
+            }
+          </Mutation>
         </form>
         <div>
           <Link to='/'> Home Page </Link>
